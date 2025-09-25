@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Prediction App</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div class="app">
+    <aside class="left">
+      <div class="search">
+        <input id="searchInput" type="text" placeholder="Search..." />
+        <div class="pill" title="search button"></div>
+      </div>
+
+      <div class="illustration">
+        <img id="weatherIcon" src="https://img.icons8.com/office/96/000000/rain.png" alt="rain illustration">
+      </div>
+
+      <div>
+        <div class="temperature" id="mainTemp">6.9<sup>°C</sup></div>
+        <div class="date-time" id="dateTime">Saturday, 09:30</div>
+        <div class="weather-desc" id="weatherDesc">Rain, Partially Cloudy<br id="perc">Perc - 0%</div>
+      </div>
+
+      <div class="location" id="locationText">Muktinath, Dhawalagiri, Nepal</div>
+    </aside>
+    <main class="right">
+
+      <div class="top-row">
+        <div class="tabs">
+          <a href="today.html"><button id="tabToday">Today</button></a>
+          <a href="project1.html"><button class="active" id="tabWeek">Week</button></a>
+        </div>
+
+        <div class="unit-toggle">
+          <button onclick="convertTemp('C')">°C</button>
+          <button onclick="convertTemp('F')">°F</button>
+
+
+        </div>
+      </div>
+      <div class="forecast" id="forecast">
+
+      </div>
+      <h3 class="highlights-title">Today's Highlights</h3>
+      <div class="highlights">
+        <div class="card">
+          <div class="label">UV Index</div>
+          <div class="value" id="uvIndex">3</div>
+          <div class="sub">Moderate</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Wind Status</div>
+          <div class="value" id="windStatus">12.2</div>
+          <div class="sub">km/h</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Sunrise &amp; Sunset</div>
+          <div class="value" id="sunTimes">05:53 am</div>
+          <div class="sub">06:17 pm</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Humidity</div>
+          <div class="value" id="humidity">83.51%</div>
+          <div class="sub">High</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Visibility</div>
+          <div class="value" id="visibility">17</div>
+          <div class="sub">Very Clear Air</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Air Quality</div>
+          <div class="value" id="airQuality">26.5</div>
+          <div class="sub">Good ✌️</div>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding:18px 0; color:#6b7280; font-size:12px;">
+        Weather Prediction App by <a href="#" style="color:#2b6ef6; text-decoration:none;">Mohan Vikram</a>
+      </div>
+
+    </main>
+  </div>
+  <script>
+    const day = {
+      temp: 28,
+      conditions: "cloudy"
+    };
+
+    const isNight = false;
+    let iconUrl = "";
+    if (day.temp < 5) {
+      iconUrl = "https://i.ibb.co/rb4rrJL/26.png";
+    } else if (day.temp >= 5 && day.temp < 20) {
+      if (day.conditions.toLowerCase().includes("rain")) {
+        iconUrl = "https://i.ibb.co/kBd2NTS/39.png";
+      } else if (day.conditions.toLowerCase().includes("cloud")) {
+        iconUrl = isNight
+          ? "https://i.ibb.co/Kzkk59k/15.png"
+          : "https://i.ibb.co/PZQXH8V/27.png";
+      } else {
+        iconUrl = isNight
+          ? "https://i.ibb.co/1nxNGHL/10.png"
+          : "https://i.ibb.co/rb4rrJL/26.png";
+      }
+    } else if (day.temp >= 20 && day.temp <= 35) {
+      if (day.conditions.toLowerCase().includes("cloud")) {
+        iconUrl = isNight
+          ? "https://i.ibb.co/Kzkk59k/15.png"
+          : "https://i.ibb.co/PZQXH8V/27.png";
+      } else {
+        iconUrl = isNight
+          ? "https://i.ibb.co/1nxNGHL/10.png"
+          : "https://i.ibb.co/rb4rrJL/26.png";
+      }
+    } else {
+      iconUrl = isNight
+        ? "https://i.ibb.co/1nxNGHL/10.png"
+        : "https://i.ibb.co/rb4rrJL/26.png";
+    }
+    document.getElementById("weatherIcon").src = iconUrl;
+
+
+
+    let currentUnit = "C";
+
+    async function hi(city) {
+      try {
+        let response = await fetch(
+          `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=EJ6UBL2JEQGYB3AA4ENASN62J&contentType=json`
+        );
+        let data = await response.json();
+        console.log(data);
+        document.getElementsByClassName("temperature")[0].innerText = data.currentConditions.temp + "°C";
+        document.getElementById('weatherDesc').innerHTML = `${data.currentConditions.conditions}<br>Perc - ${data.currentConditions.precip ?? 0}%`;
+        document.getElementsByClassName("location")[0].innerText = data.resolvedAddress;
+        document.getElementsByClassName("date-time")[0].innerText = new Date().toLocaleString();
+
+        document.getElementsByClassName("value")[0].innerText = data.currentConditions.uvindex ?? "--";
+        document.getElementsByClassName("value")[1].innerText = data.currentConditions.windspeed ?? "--";
+        document.getElementsByClassName("value")[2].innerText = data.currentConditions.sunrise ?? "--";
+        document.getElementsByClassName("sub")[2].innerText = data.currentConditions.sunset ?? "--";
+        document.getElementsByClassName("value")[3].innerText = data.currentConditions.humidity ?? "--";
+        document.getElementsByClassName("value")[4].innerText = data.currentConditions.visibility ?? "--";
+        document.getElementsByClassName("value")[5].innerText = 24.6
+
+        let forecastHTML = "";
+        data.days.slice(0, 6).forEach(day => {
+          let iconUrl = "";
+          let bgUrl = "";
+
+          let isNight = day.icon && day.icon.includes("night");
+
+          if (day.temp < 5) {
+            iconUrl = "https://i.ibb.co/rb4rrJL/26.png";
+            bgUrl = "https://i.ibb.co/qNv7NxZ/pc.webp";
+          }
+          else if (day.temp >= 5 && day.temp < 20) {
+            if (day.conditions.toLowerCase().includes("rain")) {
+              iconUrl = "https://i.ibb.co/kBd2NTS/39.png";
+              bgUrl = "https://i.ibb.co/h2p6Yhd/rain.webp";
+            } else if (day.conditions.toLowerCase().includes("cloud")) {
+              iconUrl = isNight
+                ? "https://i.ibb.co/Kzkk59k/15.png"
+                : "https://i.ibb.co/PZQXH8V/27.png";
+
+              bgUrl = isNight
+                ? "https://i.ibb.co/RDfPqXz/pcn.jpg"
+                : "https://i.ibb.co/qNv7NxZ/pc.webp";
+            } else {
+              iconUrl = isNight
+                ? "https://i.ibb.co/1nxNGHL/10.png"
+                : "https://i.ibb.co/rb4rrJL/26.png";
+
+              bgUrl = isNight
+                ? "https://i.ibb.co/kqtZ1Gx/cn.jpg"
+                : "https://i.ibb.co/WGry01m/cd.jpg";
+            }
+          }
+          else if (day.temp >= 20 && day.temp <= 35) {
+            if (day.conditions.toLowerCase().includes("cloud")) {
+              iconUrl = isNight
+                ? "https://i.ibb.co/Kzkk59k/15.png"
+                : "https://i.ibb.co/PZQXH8V/27.png";
+
+              bgUrl = isNight
+                ? "https://i.ibb.co/RDfPqXz/pcn.jpg"
+                : "https://i.ibb.co/qNv7NxZ/pc.webp";
+            } else {
+              iconUrl = isNight
+                ? "https://i.ibb.co/1nxNGHL/10.png"
+                : "https://i.ibb.co/rb4rrJL/26.png";
+
+              bgUrl = isNight
+                ? "https://i.ibb.co/kqtZ1Gx/cn.jpg"
+                : "https://i.ibb.co/WGry01m/cd.jpg";
+            }
+          }
+          else {
+
+            iconUrl = isNight
+              ? "https://i.ibb.co/1nxNGHL/10.png"
+              : "https://i.ibb.co/rb4rrJL/26.png";
+
+            bgUrl = isNight
+              ? "https://i.ibb.co/kqtZ1Gx/cn.jpg"
+              : "https://i.ibb.co/WGry01m/cd.jpg";
+          }
+
+          let dateObj = new Date(day.datetime);
+          let dayName = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+          if (day === data.days[0]) {
+            document.querySelector(".app").style.backgroundImage = `url('${bgUrl}')`;
+            document.querySelector(".app").style.backgroundSize = "cover";
+            document.querySelector(".app").style.backgroundPosition = "center";
+
+          }
+          forecastHTML += `
+    <div class="card1">
+      <div>${dayName}</div>
+      <img src="${iconUrl}" alt="${day.conditions}" width="50">
+      <div>${day.temp}°C</div>
+    </div>`;
+        });
+
+        document.getElementsByClassName("forecast")[0].innerHTML = forecastHTML;
+
+
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    }
+    function cToF(c) {
+      return (c * 9 / 5) + 32;
+    }
+    function fToC(f) {
+      return (f - 32) * 5 / 9;
+    }
+
+    function convertTemp(unit) {
+      const tempEl = document.getElementsByClassName("temperature")[0];
+      let num = parseFloat(tempEl.innerText);
+
+      if (unit === "F" && currentUnit === "C") {
+
+        tempEl.innerText = cToF(num).toFixed(1) + "°F";
+        currentUnit = "F";
+        document.querySelectorAll(".forecast .card1 div:last-child").forEach(el => {
+          let val = parseFloat(el.innerText);
+          el.innerText = cToF(val).toFixed(1) + "°F";
+        });
+
+      } else if (unit === "C" && currentUnit === "F") {
+
+        tempEl.innerText = fToC(num).toFixed(1) + "°C";
+        currentUnit = "C";
+        document.querySelectorAll(".forecast .card1 div:last-child").forEach(el => {
+          let val = parseFloat(el.innerText);
+          el.innerText = fToC(val).toFixed(1) + "°C";
+        });
+      }
+    }
+    hi("kurnool");
+    document.querySelector(".pill").addEventListener("click", function () {
+      const city = searchInput.value.trim();
+      if (city) {
+        hi(`${city}`);
+      }
+    });
+
+
+
+  </script>
+
+
+</body>
+
+</html>
