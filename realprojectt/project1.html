@@ -277,6 +277,10 @@
       const city = searchInput.value.trim();
       if (city) {
         hi(`${city}`);
+        if (currentUnit === "F") {
+  convertTemp("F");
+}
+
       }
     });
 
